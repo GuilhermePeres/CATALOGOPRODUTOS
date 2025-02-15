@@ -1,6 +1,6 @@
 package br.com.catalogo.produtos.usecase.rule.dto;
 
-import br.com.catalogo.produtos.domain.Produto;
+import br.com.catalogo.produtos.domain.ProdutoBatch;
 
-public record InputDto(Produto novoProduto) {
+public record InputDto(ProdutoBatch novoProduto) {
 }

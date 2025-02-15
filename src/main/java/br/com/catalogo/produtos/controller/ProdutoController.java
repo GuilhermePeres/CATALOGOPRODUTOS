@@ -4,7 +4,7 @@ import br.com.catalogo.produtos.controller.json.ItemPedidoReservaJson;
 import br.com.catalogo.produtos.controller.json.ProdutoJson;
 import br.com.catalogo.produtos.controller.json.ReservaProdutoJson;
 import br.com.catalogo.produtos.domain.ItemPedidoReserva;
-import br.com.catalogo.produtos.domain.Produto;
+import br.com.catalogo.produtos.domain.ProdutoBatch;
 import br.com.catalogo.produtos.domain.ReservaProduto;
 import br.com.catalogo.produtos.exception.NenhumProdutoInformadoException;
 import br.com.catalogo.produtos.gateway.api.json.EstoqueRespostaJson;
@@ -18,7 +18,8 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,11 +65,11 @@ public class ProdutoController {
 
         cleanUp(fileToImport);
 
-        if (listProdutos != null && !listProdutos.isEmpty() && listProdutos.getFirst() instanceof Produto) {
-            List<Produto> produtos = new ArrayList<>();
+        if (listProdutos != null && !listProdutos.isEmpty() && listProdutos.getFirst() instanceof ProdutoBatch) {
+            List<ProdutoBatch> produtos = new ArrayList<>();
 
             for (Object produto : listProdutos) {
-                produtos.add((Produto) produto);
+                produtos.add((ProdutoBatch) produto);
             }
 
             return produtoUseCase.registrarProdutosEmLote(produtos);

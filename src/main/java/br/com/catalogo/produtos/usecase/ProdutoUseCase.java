@@ -2,7 +2,7 @@ package br.com.catalogo.produtos.usecase;
 
 import br.com.catalogo.produtos.controller.json.ProdutoJson;
 import br.com.catalogo.produtos.domain.ItemPedidoReserva;
-import br.com.catalogo.produtos.domain.Produto;
+import br.com.catalogo.produtos.domain.ProdutoBatch;
 import br.com.catalogo.produtos.gateway.ProdutoGateway;
 import br.com.catalogo.produtos.gateway.api.json.EstoqueRespostaJson;
 import br.com.catalogo.produtos.gateway.api.json.RegistrarRespostaJson;
@@ -26,7 +26,7 @@ public class ProdutoUseCase {
         this.rules = rules;
     }
 
-    public RegistrarRespostaJson registrarProdutosEmLote(List<Produto> produtoList){
+    public RegistrarRespostaJson registrarProdutosEmLote(List<ProdutoBatch> produtoList){
         produtoList.forEach(this::validaRegras);
 
         return produtoGateway.registrarProdutosEmLote(produtoList);
@@ -40,7 +40,7 @@ public class ProdutoUseCase {
         return produtoGateway.consultarProdutos();
     }
 
-    private void validaRegras(Produto novoProduto){
+    private void validaRegras(ProdutoBatch novoProduto){
         var inputDto = new InputDto(novoProduto);
 
         rules.forEach(r -> r.validate(inputDto));

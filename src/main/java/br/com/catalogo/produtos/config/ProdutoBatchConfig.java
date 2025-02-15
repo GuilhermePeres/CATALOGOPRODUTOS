@@ -1,7 +1,6 @@
 package br.com.catalogo.produtos.config;
 
-import br.com.catalogo.produtos.controller.json.ProdutoJson;
-import br.com.catalogo.produtos.domain.Produto;
+import br.com.catalogo.produtos.domain.ProdutoBatch;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -9,14 +8,14 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -33,41 +32,32 @@ public class ProdutoBatchConfig {
 
     @Bean
     public Step step(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager,
-                     ItemReader<ProdutoJson> itemReader,
-                     ItemWriter<Produto> itemWriter,
-                     ItemProcessor<ProdutoJson, Produto> itemProcessor) {
+                     ItemReader<ProdutoBatch> itemReader,
+                     ItemWriter<ProdutoBatch> itemWriter) {
         return new StepBuilder("step", jobRepository)
-                .<ProdutoJson, Produto>chunk(5, platformTransactionManager)
+                .<ProdutoBatch, ProdutoBatch>chunk(5, platformTransactionManager)
                 .reader(itemReader)
-                .processor(itemProcessor)
                 .writer(itemWriter)
                 .build();
     }
 
     @Bean
     @StepScope
-    public ItemReader<ProdutoJson> itemReader(@Value("#{jobParameters['filePath']}") String filePath) {
-        return new FlatFileItemReaderBuilder<ProdutoJson>()
-                .name("produtoJsonItemReader")
-                .resource(new FileSystemResource(filePath))
-                .delimited()
+    public ItemReader<ProdutoBatch> itemReader(@Value("#{jobParameters['filePath']}") String filePath) {
+        BeanWrapperFieldSetMapper<ProdutoBatch> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
+        fieldSetMapper.setTargetType(ProdutoBatch.class);
+
+        return new FlatFileItemReaderBuilder<ProdutoBatch>()
+                .name("produtoItemReader")
+                .resource(new ClassPathResource(filePath))
+                .delimited().delimiter(",")
                 .names("nome", "descricao", "preco", "quantidadeEmEstoque")
-                .fieldSetMapper(new ProdutoJsonFieldSetMapper())
+                .fieldSetMapper(fieldSetMapper)
                 .build();
     }
 
     @Bean
-    public ItemProcessor<ProdutoJson, Produto> itemProcessor() {
-        return json -> new Produto(
-                    json.getNome(),
-                    json.getDescricao(),
-                    json.getPreco(),
-                    json.getQuantidadeEmEstoque()
-        );
-    }
-
-    @Bean
-    public ItemWriter<Produto> itemWriter(){
+    public ItemWriter<ProdutoBatch> itemWriter(){
         return new ProdutoItemWriter();
     }
 
