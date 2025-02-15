@@ -1,14 +1,11 @@
-package br.com.catalogo.produtos.gateway.database.jpa;
+package br.com.catalogo.produtos.jpa.repository;
 
-import br.com.catalogo.produtos.domain.Produto;
-import br.com.catalogo.produtos.gateway.api.json.RegistrarRespostaJson;
 import br.com.catalogo.produtos.gateway.database.jpa.entity.ProdutoEntity;
 import br.com.catalogo.produtos.gateway.database.jpa.repository.ProdutoRepository;
 import br.com.catalogo.produtos.utils.ProdutoHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -16,13 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
-class ProdutoJpaGatewayTest {
-    @InjectMocks
-    private ProdutoJpaGateway produtoJpaGateway;
+class ProdutoRepositoryTest {
 
     @Mock
     private ProdutoRepository produtoRepository;
@@ -42,16 +35,20 @@ class ProdutoJpaGatewayTest {
     @Test
     void devePermitirRegistrarProdutosEmLote(){
         //Arrange
-        List<Produto> produtos = ProdutoHelper.gerarListaProduto();
+        List<ProdutoEntity> produtos = ProdutoHelper.gerarListaProdutoEntity();
+
+        when(produtoRepository.saveAll(produtos)).thenReturn(produtos);
 
         //Act
-        RegistrarRespostaJson respostaJson = produtoJpaGateway.registrarProdutosEmLote(produtos);
+        List<ProdutoEntity> produtosRegistrados = produtoRepository.saveAll(produtos);
 
         //Assert
-        assertThat(respostaJson).isNotNull();
-        assertThat(respostaJson.isProdutosRegistrados()).isTrue();
+        assertThat(produtosRegistrados)
+                .isNotNull()
+                .isEqualTo(produtos);
 
-        verify(produtoRepository, times(1)).saveAll(anyList());
+        verify(produtoRepository, times(1)).saveAll(argThat(argument ->
+                argument instanceof List<ProdutoEntity>));
     }
 
     @Test

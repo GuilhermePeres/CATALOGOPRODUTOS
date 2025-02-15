@@ -4,7 +4,7 @@ import br.com.catalogo.produtos.controller.json.ExceptionJson;
 import br.com.catalogo.produtos.exception.ErroAoAcessarRepositorioException;
 import br.com.catalogo.produtos.exception.NenhumProdutoInformadoException;
 import br.com.catalogo.produtos.exception.PrecoMenorIgualAZeroException;
-import br.com.catalogo.produtos.exception.QuantidadeEmEstoqueMenorOuIgualAZeroException;
+import br.com.catalogo.produtos.exception.QuantidadeMenorOuIgualAZeroException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +33,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exceptionJson, new HttpHeaders(), ex.getHttpStatus());
     }
 
-    @ExceptionHandler(QuantidadeEmEstoqueMenorOuIgualAZeroException.class)
-    public ResponseEntity<ExceptionJson> tratarQuantidadeEmEstoqueMenorQueZeroException(QuantidadeEmEstoqueMenorOuIgualAZeroException ex) {
+    @ExceptionHandler(QuantidadeMenorOuIgualAZeroException.class)
+    public ResponseEntity<ExceptionJson> tratarQuantidadeEmEstoqueMenorQueZeroException(QuantidadeMenorOuIgualAZeroException ex) {
         final ExceptionJson exceptionJson = new ExceptionJson(ex.getCode(), ex.getMessage());
 
         log.error(ex.getMessage(), ex);
