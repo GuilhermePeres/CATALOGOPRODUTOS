@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class ProdutoEntryPoint {
+public class ProdutoEntrypoint {
 
     private final ObjectMapper objectMapper;
     private final ProdutoUseCase produtoUseCase;
