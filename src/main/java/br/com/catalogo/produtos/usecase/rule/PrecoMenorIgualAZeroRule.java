@@ -6,7 +6,7 @@ import br.com.catalogo.produtos.usecase.rule.dto.InputDto;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProdutoPrecoMaiorQueZeroRule implements RuleBase{
+public class PrecoMenorIgualAZeroRule implements RuleBase{
 
     @Override
     public void validate(InputDto inputDto) {
