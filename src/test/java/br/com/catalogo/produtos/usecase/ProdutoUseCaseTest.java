@@ -3,8 +3,8 @@ package br.com.catalogo.produtos.usecase;
 import br.com.catalogo.produtos.controller.api.json.ProdutoJson;
 import br.com.catalogo.produtos.domain.ItemPedidoReserva;
 import br.com.catalogo.produtos.domain.ProdutoBatch;
+import br.com.catalogo.produtos.gateway.PedidoGateway;
 import br.com.catalogo.produtos.gateway.ProdutoGateway;
-import br.com.catalogo.produtos.gateway.api.json.EstoqueRespostaJson;
 import br.com.catalogo.produtos.gateway.api.json.RegistrarRespostaJson;
 import br.com.catalogo.produtos.usecase.rule.RuleBase;
 import br.com.catalogo.produtos.utils.ProdutoHelper;
@@ -26,6 +26,9 @@ class ProdutoUseCaseTest {
 
     @Mock
     private ProdutoGateway produtoGateway;
+
+    @Mock
+    private PedidoGateway pedidoGateway;
 
     @Mock
     private List<RuleBase> rules;
@@ -66,9 +69,8 @@ class ProdutoUseCaseTest {
         //Arrange
         Long idPedido = 1L;
         List<ItemPedidoReserva> itens = ProdutoHelper.gerarListaItemPedidoReservaAleatorio();
-        EstoqueRespostaJson respostaEsperada = new EstoqueRespostaJson(idPedido, true);
 
-        when(produtoGateway.atualizarProdutosPorPedido(idPedido, itens)).thenReturn(respostaEsperada);
+        doNothing().when(pedidoGateway).enviarRespostaEstoque(any());
 
         //Act
         produtoUseCase.atualizarProdutosPorPedido(idPedido, itens);
