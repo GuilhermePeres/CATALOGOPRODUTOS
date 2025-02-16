@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -32,7 +33,7 @@ class ProdutoRepositoryTest {
     }
 
     @Test
-    void devePermitirRegistrarProdutosEmLote() {
+    void devePermitirSalvarListaDeProdutos() {
         //Arrange
         List<ProdutoEntity> produtos = ProdutoHelper.gerarListaProdutoEntity();
 
@@ -48,5 +49,40 @@ class ProdutoRepositoryTest {
 
         verify(produtoRepository, times(1)).saveAll(argThat(argument ->
                 argument instanceof List<ProdutoEntity>));
+    }
+
+    @Test
+    void devePermitirEncontrarProdutoPorId() {
+        //Arrange
+        List<ProdutoEntity> produtos = ProdutoHelper.gerarListaProdutoEntity();
+
+        when(produtoRepository.findById(anyLong())).thenReturn(Optional.of(produtos.getFirst()));
+
+        //Act
+        Optional<ProdutoEntity> produtoEncontrado = produtoRepository.findById(produtos.getFirst().getId());
+
+        //Assert
+        assertThat(produtoEncontrado).isPresent();
+        assertThat(produtoEncontrado.get().getId()).isEqualTo(produtos.getFirst().getId());
+        assertThat(produtoEncontrado.get().getNome()).isEqualTo(produtos.getFirst().getNome());
+        assertThat(produtoEncontrado.get().getDescricao()).isEqualTo(produtos.getFirst().getDescricao());
+        assertThat(produtoEncontrado.get().getPreco()).isEqualTo(produtos.getFirst().getPreco());
+        assertThat(produtoEncontrado.get().getQuantidadeEmEstoque()).isEqualTo(produtos.getFirst().getQuantidadeEmEstoque());
+    }
+
+    @Test
+    void devePermitirEncontrarTodosOsProdutos() {
+        //Arrange
+        List<ProdutoEntity> produtos = ProdutoHelper.gerarListaProdutoEntity();
+
+        when(produtoRepository.findAll()).thenReturn(produtos);
+
+        //Act
+        List<ProdutoEntity> produtosRetornados = produtoRepository.findAll();
+
+        // Assert
+        assertThat(produtosRetornados)
+                .hasSize(2)
+                .isEqualTo(produtos);
     }
 }
