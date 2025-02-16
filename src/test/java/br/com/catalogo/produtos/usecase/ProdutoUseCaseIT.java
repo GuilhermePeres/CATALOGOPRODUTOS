@@ -5,12 +5,11 @@ import br.com.catalogo.produtos.controller.api.json.ProdutoJson;
 import br.com.catalogo.produtos.domain.ItemPedidoReserva;
 import br.com.catalogo.produtos.domain.ProdutoBatch;
 import br.com.catalogo.produtos.gateway.ProdutoGateway;
-import br.com.catalogo.produtos.gateway.api.json.EstoqueRespostaJson;
 import br.com.catalogo.produtos.gateway.api.json.RegistrarRespostaJson;
+import br.com.catalogo.produtos.gateway.database.jpa.entity.ProdutoEntity;
 import br.com.catalogo.produtos.gateway.database.jpa.repository.ProdutoRepository;
 import br.com.catalogo.produtos.usecase.rule.RuleBase;
 import br.com.catalogo.produtos.utils.ProdutoHelper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -19,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,22 +54,21 @@ class ProdutoUseCaseIT {
     }
 
     @Test
-    @Disabled
     void deveAtualizarProdutosPorPedidoComSucesso() {
         //Arrange
         Long idPedido = 10L;
         List<ItemPedidoReserva> itens = List.of(
-                new ItemPedidoReserva(1L,10),
-                new ItemPedidoReserva(2L,10)
+                new ItemPedidoReserva(1L,10)
         );
 
         //Act
-        EstoqueRespostaJson resposta = produtoUseCase.atualizarProdutosPorPedido(idPedido, itens);
+        produtoUseCase.atualizarProdutosPorPedido(idPedido, itens);
 
         //Assert
-        assertThat(resposta).isNotNull();
-        assertThat(resposta.getPedidoId()).isEqualTo(idPedido);
-        assertThat(resposta.isEstoqueDisponivel()).isTrue();
+        Optional<ProdutoEntity> produto = produtoRepository.findById(1L);
+        assertThat(produto).isPresent();
+        ProdutoEntity produtoEntity = produto.get();
+        assertThat(produtoEntity.getQuantidadeEmEstoque()).isZero();
     }
 
     @Test

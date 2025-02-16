@@ -35,12 +35,10 @@ public class ProdutoUseCase {
         return produtoGateway.registrarProdutosEmLote(produtoList);
     }
 
-    public EstoqueRespostaJson atualizarProdutosPorPedido(Long idPedido, List<ItemPedidoReserva> itens){
+    public void atualizarProdutosPorPedido(Long idPedido, List<ItemPedidoReserva> itens){
         EstoqueRespostaJson estoqueRespostaJson = produtoGateway.atualizarProdutosPorPedido(idPedido, itens);
 
         pedidoGateway.enviarRespostaEstoque(estoqueRespostaJson);
-
-        return estoqueRespostaJson;
     }
 
     public List<ProdutoJson> consultarProdutos() {

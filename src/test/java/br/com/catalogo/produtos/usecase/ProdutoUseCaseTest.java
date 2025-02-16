@@ -10,7 +10,6 @@ import br.com.catalogo.produtos.usecase.rule.RuleBase;
 import br.com.catalogo.produtos.utils.ProdutoHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -63,7 +62,6 @@ class ProdutoUseCaseTest {
     }
 
     @Test
-    @Disabled
     void deveAtualizarProdutosPorPedidoComSucesso() {
         //Arrange
         Long idPedido = 1L;
@@ -73,13 +71,9 @@ class ProdutoUseCaseTest {
         when(produtoGateway.atualizarProdutosPorPedido(idPedido, itens)).thenReturn(respostaEsperada);
 
         //Act
-        EstoqueRespostaJson resposta = produtoUseCase.atualizarProdutosPorPedido(idPedido, itens);
+        produtoUseCase.atualizarProdutosPorPedido(idPedido, itens);
 
         //Assert
-        assertThat(resposta).isNotNull();
-        assertThat(resposta.getPedidoId()).isEqualTo(idPedido);
-        assertThat(resposta.isEstoqueDisponivel()).isTrue();
-
         verify(produtoGateway, times(1)).atualizarProdutosPorPedido(idPedido, itens);
     }
 
