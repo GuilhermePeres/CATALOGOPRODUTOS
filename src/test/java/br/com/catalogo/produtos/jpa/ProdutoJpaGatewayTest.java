@@ -59,6 +59,18 @@ class ProdutoJpaGatewayTest {
     }
 
     @Test
+    void deveLancarErroAoAcessarRepositorioExceptionAoRegistrarProdutosEmLote(){
+        //Arrange
+        List<ProdutoBatch> produtos = ProdutoHelper.gerarListaProdutoBatch();
+        when(produtoRepository.saveAll(anyList())).thenThrow(new RuntimeException());
+
+        //Act Assert
+        assertThatThrownBy(() -> produtoJpaGateway.registrarProdutosEmLote(produtos))
+                .isInstanceOf(ErroAoAcessarRepositorioException.class);
+    }
+
+
+    @Test
     void deveAtualizarProdutosEmLoteComSucesso() {
         //Arrange
         List<ProdutoEntity> produtos = ProdutoHelper.gerarListaProdutoEntity();
@@ -154,6 +166,7 @@ class ProdutoJpaGatewayTest {
         assertThatThrownBy(() -> produtoJpaGateway.atualizarProdutosPorPedido(idPedido, itens))
                 .isInstanceOf(ErroAoAcessarRepositorioException.class);
     }
+
     @Test
     void deveConsultarProdutosComSucesso() {
         //Arrange
