@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS produtos (
-    id UUID PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     nome VARCHAR(255),
     descricao VARCHAR(255),
     preco NUMERIC(19, 2),

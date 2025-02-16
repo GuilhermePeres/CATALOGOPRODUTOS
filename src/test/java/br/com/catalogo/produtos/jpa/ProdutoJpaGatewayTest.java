@@ -1,6 +1,7 @@
 package br.com.catalogo.produtos.jpa;
 
 import br.com.catalogo.produtos.domain.Produto;
+import br.com.catalogo.produtos.domain.ProdutoBatch;
 import br.com.catalogo.produtos.gateway.api.json.RegistrarRespostaJson;
 import br.com.catalogo.produtos.gateway.database.jpa.ProdutoJpaGateway;
 import br.com.catalogo.produtos.gateway.database.jpa.entity.ProdutoEntity;
@@ -43,7 +44,7 @@ class ProdutoJpaGatewayTest {
     @Test
     void devePermitirRegistrarProdutosEmLote(){
         //Arrange
-        List<Produto> produtos = ProdutoHelper.gerarListaProduto();
+        List<ProdutoBatch> produtos = ProdutoHelper.gerarListaProduto();
 
         //Act
         RegistrarRespostaJson respostaJson = produtoJpaGateway.registrarProdutosEmLote(produtos);

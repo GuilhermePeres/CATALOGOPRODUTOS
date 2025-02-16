@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -17,8 +16,7 @@ import java.util.UUID;
 @Table(name="produtos")
 public class ProdutoEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private Long id;
     private String nome;
     private String descricao;
     private BigDecimal preco;

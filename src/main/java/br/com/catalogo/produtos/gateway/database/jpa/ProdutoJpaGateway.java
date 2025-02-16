@@ -2,7 +2,6 @@ package br.com.catalogo.produtos.gateway.database.jpa;
 
 import br.com.catalogo.produtos.controller.json.ProdutoJson;
 import br.com.catalogo.produtos.domain.ItemPedidoReserva;
-import br.com.catalogo.produtos.domain.Produto;
 import br.com.catalogo.produtos.domain.ProdutoBatch;
 import br.com.catalogo.produtos.exception.ErroAoAcessarRepositorioException;
 import br.com.catalogo.produtos.gateway.ProdutoGateway;
@@ -17,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class ProdutoJpaGateway implements ProdutoGateway {
@@ -42,13 +42,9 @@ public class ProdutoJpaGateway implements ProdutoGateway {
         }
     }
 
-    private RegistrarRespostaJson registrarProdutosEmLoteSemBacth(List<Produto> produto){
+    private void atualizarProdutosEmLote(List<ProdutoEntity> produtos){
         try{
-            List<ProdutoEntity> produtoEntityList = mapToEntityProduto(produto);
-
-            produtoRepository.saveAll(produtoEntityList);
-
-            return new RegistrarRespostaJson(true);
+            produtoRepository.saveAll(produtos);
 
         }catch (Exception e){
             throw new ErroAoAcessarRepositorioException();
@@ -57,7 +53,7 @@ public class ProdutoJpaGateway implements ProdutoGateway {
 
     @Override
     public EstoqueRespostaJson atualizarProdutosPorPedido(Long idPedido, List<ItemPedidoReserva> itens){
-        List<Produto> produtoList = new ArrayList<>(List.of());
+        List<ProdutoEntity> produtoList = new ArrayList<>(List.of());
 
         try{
             for(ItemPedidoReserva item : itens){
@@ -70,14 +66,14 @@ public class ProdutoJpaGateway implements ProdutoGateway {
                     int novoEstoque = produto.get().getQuantidadeEmEstoque() - item.quantidade();
                     produto.get().setQuantidadeEmEstoque(novoEstoque);
 
-                    produtoList.add(mapToDomain(produto.get()));
+                    produtoList.add(produto.get());
                 }
             }
         }catch (Exception e){
             throw new ErroAoAcessarRepositorioException();
         }
 
-        registrarProdutosEmLoteSemBacth(produtoList);
+        atualizarProdutosEmLote(produtoList);
 
         return new EstoqueRespostaJson(idPedido, true);
     }
@@ -95,32 +91,16 @@ public class ProdutoJpaGateway implements ProdutoGateway {
     }
 
     private List<ProdutoEntity> mapToEntity(List<ProdutoBatch> produto){
+        UUID uuid = UUID.randomUUID();
+        long numeroAleatorio = uuid.getMostSignificantBits() & Long.MAX_VALUE;
+
         return produto.stream().map(prod -> new ProdutoEntity(
-                null,
+                numeroAleatorio,
                 prod.getNome(),
                 prod.getDescricao(),
                 new BigDecimal(prod.getPreco()),
                 prod.getQuantidadeEmEstoque())
         ).toList();
-    }
-
-    private List<ProdutoEntity> mapToEntityProduto(List<Produto> produto){
-        return produto.stream().map(prod -> new ProdutoEntity(
-                null,
-                prod.getNome(),
-                prod.getDescricao(),
-                prod.getPreco(),
-                prod.getQuantidadeEmEstoque())
-        ).toList();
-    }
-
-    private Produto mapToDomain(ProdutoEntity produtoEntity){
-        return new Produto(
-                produtoEntity.getNome(),
-                produtoEntity.getDescricao(),
-                produtoEntity.getPreco(),
-                produtoEntity.getQuantidadeEmEstoque()
-        );
     }
 
     private List<ProdutoJson> mapToProdutoJson(List<ProdutoEntity> produtosEntity){

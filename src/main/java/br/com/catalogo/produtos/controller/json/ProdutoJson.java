@@ -5,13 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProdutoJson {
-    private UUID id;
+    private Long id;
     private String nome;
     private String descricao;
     private BigDecimal preco;

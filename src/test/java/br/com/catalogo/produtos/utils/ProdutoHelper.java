@@ -1,25 +1,28 @@
 package br.com.catalogo.produtos.utils;
 
-import br.com.catalogo.produtos.domain.Produto;
+import br.com.catalogo.produtos.domain.ProdutoBatch;
 import br.com.catalogo.produtos.gateway.database.jpa.entity.ProdutoEntity;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.util.List;
-import java.util.UUID;
 
 public class ProdutoHelper {
 
     public static List<ProdutoEntity> gerarListaProdutoEntity(){
+        SecureRandom random = new SecureRandom();
+        long numeroAleatorio = random.nextLong();
+
         return List.of(
                 new ProdutoEntity(
-                        UUID.randomUUID(),
+                        numeroAleatorio,
                         "Formador de Heróis",
                         "5 Práticas Essenciais Para Líderes Multiplicarem Líderes...",
                         BigDecimal.valueOf(50.59),
                         20
                 ),
                 new ProdutoEntity(
-                        UUID.randomUUID(),
+                        numeroAleatorio,
                         "Lidere com isso em mente",
                         "Lidere com isso em mente apresenta percepções transformadoras de Groeschel",
                         BigDecimal.valueOf(49.46),
@@ -27,18 +30,18 @@ public class ProdutoHelper {
         );
     }
 
-    public static List<Produto> gerarListaProduto(){
+    public static List<ProdutoBatch> gerarListaProduto(){
         return List.of(
-                new Produto(
+                new ProdutoBatch(
                         "Formador de Heróis",
                         "5 Práticas Essenciais Para Líderes Multiplicarem Líderes...",
-                        BigDecimal.valueOf(50.59),
+                        "50.59",
                         20
                 ),
-                new Produto(
+                new ProdutoBatch(
                         "Lidere com isso em mente",
                         "Lidere com isso em mente apresenta percepções transformadoras de Groeschel",
-                        BigDecimal.valueOf(49.46),
+                        "49.46",
                         20)
         );
     }

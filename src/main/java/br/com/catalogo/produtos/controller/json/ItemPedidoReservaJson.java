@@ -4,12 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemPedidoReservaJson {
-    private UUID produtoId;
+    private Long produtoId;
     private Integer quantidade;
 }
