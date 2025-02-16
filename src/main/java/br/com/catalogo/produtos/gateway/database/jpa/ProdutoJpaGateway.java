@@ -42,7 +42,7 @@ public class ProdutoJpaGateway implements ProdutoGateway {
         }
     }
 
-    private void atualizarProdutosEmLote(List<ProdutoEntity> produtos){
+    public void atualizarProdutosEmLote(List<ProdutoEntity> produtos){
         try{
             produtoRepository.saveAll(produtos);
 
@@ -91,11 +91,8 @@ public class ProdutoJpaGateway implements ProdutoGateway {
     }
 
     private List<ProdutoEntity> mapToEntity(List<ProdutoBatch> produto){
-        UUID uuid = UUID.randomUUID();
-        long numeroAleatorio = uuid.getMostSignificantBits() & Long.MAX_VALUE;
-
         return produto.stream().map(prod -> new ProdutoEntity(
-                numeroAleatorio,
+                UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE,
                 prod.getNome(),
                 prod.getDescricao(),
                 new BigDecimal(prod.getPreco()),

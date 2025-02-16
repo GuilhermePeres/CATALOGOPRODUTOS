@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -23,17 +22,17 @@ class ProdutoRepositoryTest {
     AutoCloseable openMocks;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         openMocks = MockitoAnnotations.openMocks(this);
     }
 
     @AfterEach
-    void tearDown() throws Exception{
+    void tearDown() throws Exception {
         openMocks.close();
     }
 
     @Test
-    void devePermitirRegistrarProdutosEmLote(){
+    void devePermitirRegistrarProdutosEmLote() {
         //Arrange
         List<ProdutoEntity> produtos = ProdutoHelper.gerarListaProdutoEntity();
 
@@ -49,31 +48,5 @@ class ProdutoRepositoryTest {
 
         verify(produtoRepository, times(1)).saveAll(argThat(argument ->
                 argument instanceof List<ProdutoEntity>));
-    }
-
-    @Test
-    void devePermitirBuscarProduto(){
-        //Arrange
-        List<ProdutoEntity> produtos = ProdutoHelper.gerarListaProdutoEntity();
-
-        when(produtoRepository.findByNome(produtos.getFirst().getNome())).thenReturn(Optional.of(produtos.getFirst()));
-
-        //Act
-        Optional<ProdutoEntity> produtoEntityRecebido = produtoRepository.findByNome(produtos.getFirst().getNome());
-
-        //Assert
-        assertThat(produtoEntityRecebido)
-                .isPresent()
-                .containsSame(produtos.getFirst());
-
-        produtoEntityRecebido.ifPresent(produtoEntity -> {
-            assertThat(produtoEntity.getId()).isEqualTo(produtos.getFirst().getId());
-            assertThat(produtoEntity.getNome()).isEqualTo(produtos.getFirst().getNome());
-            assertThat(produtoEntity.getDescricao()).isEqualTo(produtos.getFirst().getDescricao());
-            assertThat(produtoEntity.getPreco()).isEqualTo(produtos.getFirst().getPreco());
-            assertThat(produtoEntity.getQuantidadeEmEstoque()).isEqualTo(produtos.getFirst().getQuantidadeEmEstoque());
-        });
-
-        verify(produtoRepository, times(1)).findByNome(any(String.class));
     }
 }

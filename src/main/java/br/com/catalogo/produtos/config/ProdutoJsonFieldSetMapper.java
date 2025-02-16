@@ -4,13 +4,12 @@ import br.com.catalogo.produtos.controller.json.ProdutoJson;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 
-import java.security.SecureRandom;
+import java.util.UUID;
 
 public class ProdutoJsonFieldSetMapper implements FieldSetMapper<ProdutoJson> {
     @Override
     public ProdutoJson mapFieldSet(FieldSet fieldSet) {
-        SecureRandom random = new SecureRandom();
-        long numeroAleatorio = random.nextLong();
+        long numeroAleatorio = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
 
         return new ProdutoJson(
                 numeroAleatorio,

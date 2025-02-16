@@ -1,7 +1,10 @@
 package br.com.catalogo.produtos.jpa;
 
-import br.com.catalogo.produtos.domain.Produto;
+import br.com.catalogo.produtos.controller.json.ProdutoJson;
+import br.com.catalogo.produtos.domain.ItemPedidoReserva;
 import br.com.catalogo.produtos.domain.ProdutoBatch;
+import br.com.catalogo.produtos.exception.ErroAoAcessarRepositorioException;
+import br.com.catalogo.produtos.gateway.api.json.EstoqueRespostaJson;
 import br.com.catalogo.produtos.gateway.api.json.RegistrarRespostaJson;
 import br.com.catalogo.produtos.gateway.database.jpa.ProdutoJpaGateway;
 import br.com.catalogo.produtos.gateway.database.jpa.entity.ProdutoEntity;
@@ -18,9 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 class ProdutoJpaGatewayTest {
     @InjectMocks
@@ -44,7 +46,7 @@ class ProdutoJpaGatewayTest {
     @Test
     void devePermitirRegistrarProdutosEmLote(){
         //Arrange
-        List<ProdutoBatch> produtos = ProdutoHelper.gerarListaProduto();
+        List<ProdutoBatch> produtos = ProdutoHelper.gerarListaProdutoBatch();
 
         //Act
         RegistrarRespostaJson respostaJson = produtoJpaGateway.registrarProdutosEmLote(produtos);
@@ -57,28 +59,135 @@ class ProdutoJpaGatewayTest {
     }
 
     @Test
-    void devePermitirBuscarProduto(){
+    void deveAtualizarProdutosEmLoteComSucesso() {
         //Arrange
         List<ProdutoEntity> produtos = ProdutoHelper.gerarListaProdutoEntity();
 
-        when(produtoRepository.findByNome(produtos.getFirst().getNome())).thenReturn(Optional.of(produtos.getFirst()));
-
         //Act
-        Optional<ProdutoEntity> produtoEntityRecebido = produtoRepository.findByNome(produtos.getFirst().getNome());
+        produtoJpaGateway.atualizarProdutosEmLote(produtos);
 
         //Assert
-        assertThat(produtoEntityRecebido)
-                .isPresent()
-                .containsSame(produtos.getFirst());
+        verify(produtoRepository, times(1)).saveAll(produtos);
+    }
 
-        produtoEntityRecebido.ifPresent(produtoEntity -> {
-            assertThat(produtoEntity.getId()).isEqualTo(produtos.getFirst().getId());
-            assertThat(produtoEntity.getNome()).isEqualTo(produtos.getFirst().getNome());
-            assertThat(produtoEntity.getDescricao()).isEqualTo(produtos.getFirst().getDescricao());
-            assertThat(produtoEntity.getPreco()).isEqualTo(produtos.getFirst().getPreco());
-            assertThat(produtoEntity.getQuantidadeEmEstoque()).isEqualTo(produtos.getFirst().getQuantidadeEmEstoque());
-        });
+    @Test
+    void deveLancarErroAoAcessarRepositorioExceptionAoAtualizarProdutosEmLote() {
+        //Arrange
+        List<ProdutoEntity> produtos = ProdutoHelper.gerarListaProdutoEntity();
+        when(produtoRepository.saveAll(produtos)).thenThrow(new RuntimeException());
 
-        verify(produtoRepository, times(1)).findByNome(any(String.class));
+        //Act Assert
+        assertThatThrownBy(() -> produtoJpaGateway.atualizarProdutosEmLote(produtos))
+                .isInstanceOf(ErroAoAcessarRepositorioException.class);
+    }
+
+    @Test
+    void deveAtualizarProdutosPorPedidoComSucesso() {
+        //Arrange
+        Long idPedido = 1L;
+        List<ItemPedidoReserva> itens = ProdutoHelper.gerarListaItemPedidoReservaAleatorio();
+        List<ProdutoEntity> produtos = ProdutoHelper.gerarListaProdutoEntity();
+
+        when(produtoRepository.findById(anyLong())).thenReturn(Optional.of(produtos.getFirst()));
+
+        //Act
+        EstoqueRespostaJson resposta = produtoJpaGateway.atualizarProdutosPorPedido(idPedido, itens);
+
+        //Assert
+        assertThat(resposta).isNotNull();
+        assertThat(resposta.isEstoqueDisponivel()).isTrue();
+        assertThat(resposta.getPedidoId()).isEqualTo(idPedido);
+
+        verify(produtoRepository, times(itens.size())).findById(anyLong());
+        verify(produtoRepository, times(1)).saveAll(anyList());
+    }
+
+    @Test
+    void deveAtualizarProdutosPorPedidoProdutoNaoEncontrado() {
+        //Arrange
+        Long idPedido = 1L;
+        List<ItemPedidoReserva> itens = ProdutoHelper.gerarListaItemPedidoReservaAleatorio();
+
+        when(produtoRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //Act
+        EstoqueRespostaJson resposta = produtoJpaGateway.atualizarProdutosPorPedido(idPedido, itens);
+
+        //Assert
+        assertThat(resposta).isNotNull();
+        assertThat(resposta.isEstoqueDisponivel()).isFalse();
+        assertThat(resposta.getPedidoId()).isEqualTo(idPedido);
+
+        verify(produtoRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void deveAtualizarProdutosPorPedidoEstoqueInsuficiente() {
+        //Arrange
+        Long idPedido = 1L;
+        List<ItemPedidoReserva> itens = ProdutoHelper.gerarListaItemPedidoReservaAleatorio();
+        List<ProdutoEntity> produto = ProdutoHelper.gerarListaProdutoEntity();
+        produto.getFirst().setQuantidadeEmEstoque(0);
+
+        when(produtoRepository.findById(anyLong())).thenReturn(Optional.of(produto.getFirst()));
+
+        //Act
+        EstoqueRespostaJson resposta = produtoJpaGateway.atualizarProdutosPorPedido(idPedido, itens);
+
+        //Assert
+        assertThat(resposta).isNotNull();
+        assertThat(resposta.isEstoqueDisponivel()).isFalse();
+        assertThat(resposta.getPedidoId()).isEqualTo(idPedido);
+
+        verify(produtoRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void deveLancarErroAoAcessarRepositorioExceptionAoAtualizarProdutosPorPedido() {
+        //Arrange
+        Long idPedido = 1L;
+        List<ItemPedidoReserva> itens = ProdutoHelper.gerarListaItemPedidoReservaAleatorio();
+
+        when(produtoRepository.findById(anyLong())).thenThrow(new RuntimeException());
+
+        //Act Assert
+        assertThatThrownBy(() -> produtoJpaGateway.atualizarProdutosPorPedido(idPedido, itens))
+                .isInstanceOf(ErroAoAcessarRepositorioException.class);
+    }
+    @Test
+    void deveConsultarProdutosComSucesso() {
+        //Arrange
+        List<ProdutoEntity> produtosEntity = ProdutoHelper.gerarListaProdutoEntity();
+
+        when(produtoRepository.findAll()).thenReturn(produtosEntity);
+
+        //Act
+        List<ProdutoJson> resultado = produtoJpaGateway.consultarProdutos();
+
+        //Assert
+        assertThat(resultado).hasSize(produtosEntity.size());
+
+        for(int i=0; i<resultado.size(); i++){
+            ProdutoJson produtoJson = resultado.get(i);
+            ProdutoEntity produtoEntity = produtosEntity.get(i);
+
+            assertThat(produtoJson.getId()).isEqualTo(produtoEntity.getId());
+            assertThat(produtoJson.getNome()).isEqualTo(produtoEntity.getNome());
+            assertThat(produtoJson.getDescricao()).isEqualTo(produtoEntity.getDescricao());
+            assertThat(produtoJson.getPreco()).isEqualTo(produtoEntity.getPreco());
+            assertThat(produtoJson.getQuantidadeEmEstoque()).isEqualTo(produtoEntity.getQuantidadeEmEstoque());
+        }
+
+        verify(produtoRepository, times(1)).findAll();
+    }
+
+    @Test
+    void deveLancarErroAoAcessarRepositorioExceptionAoConsultarProdutos() {
+        //Arrange
+        when(produtoRepository.findAll()).thenThrow(new RuntimeException());
+
+        //Act Assert
+        assertThatThrownBy(() -> produtoJpaGateway.consultarProdutos())
+                .isInstanceOf(ErroAoAcessarRepositorioException.class);
     }
 }
