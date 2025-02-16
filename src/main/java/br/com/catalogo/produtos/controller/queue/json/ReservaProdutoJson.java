@@ -1,5 +1,6 @@
-package br.com.catalogo.produtos.controller.json;
+package br.com.catalogo.produtos.controller.queue.json;
 
+import br.com.catalogo.produtos.controller.api.json.ItemPedidoReservaJson;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

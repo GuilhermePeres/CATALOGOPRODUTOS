@@ -1,13 +1,8 @@
-package br.com.catalogo.produtos.controller;
+package br.com.catalogo.produtos.controller.api;
 
-import br.com.catalogo.produtos.controller.json.ItemPedidoReservaJson;
-import br.com.catalogo.produtos.controller.json.ProdutoJson;
-import br.com.catalogo.produtos.controller.json.ReservaProdutoJson;
-import br.com.catalogo.produtos.domain.ItemPedidoReserva;
+import br.com.catalogo.produtos.controller.api.json.ProdutoJson;
 import br.com.catalogo.produtos.domain.ProdutoBatch;
-import br.com.catalogo.produtos.domain.ReservaProduto;
 import br.com.catalogo.produtos.exception.NenhumProdutoInformadoException;
-import br.com.catalogo.produtos.gateway.api.json.EstoqueRespostaJson;
 import br.com.catalogo.produtos.gateway.api.json.RegistrarRespostaJson;
 import br.com.catalogo.produtos.usecase.ProdutoUseCase;
 import org.springframework.batch.core.*;
@@ -87,28 +82,4 @@ public class ProdutoController {
         return produtoUseCase.consultarProdutos();
     }
 
-    @PutMapping
-    public EstoqueRespostaJson atualizarProdutosPorPedido(@RequestBody ReservaProdutoJson reservaProdutoJson){
-        ReservaProduto reservaProduto = mapToDomain(reservaProdutoJson);
-
-        return produtoUseCase.atualizarProdutosPorPedido(reservaProduto.getPedidoId(),reservaProduto.getItens());
-    }
-
-    private ReservaProduto mapToDomain(ReservaProdutoJson reservaProdutoJson){
-        List<ItemPedidoReserva> itensPedidoReserva = new ArrayList<>();
-
-        for (ItemPedidoReservaJson itemJson : reservaProdutoJson.getItens()) {
-            ItemPedidoReserva itemPedidoReserva = new ItemPedidoReserva(
-                    itemJson.getProdutoId(),
-                    itemJson.getQuantidade()
-            );
-            itensPedidoReserva.add(itemPedidoReserva);
-        }
-
-        return new ReservaProduto(
-                reservaProdutoJson.getPedidoId(),
-                reservaProdutoJson.getClienteId(),
-                itensPedidoReserva
-        );
-    }
 }

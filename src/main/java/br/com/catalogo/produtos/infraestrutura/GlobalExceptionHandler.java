@@ -1,6 +1,6 @@
 package br.com.catalogo.produtos.infraestrutura;
 
-import br.com.catalogo.produtos.controller.json.ExceptionJson;
+import br.com.catalogo.produtos.controller.api.json.ExceptionJson;
 import br.com.catalogo.produtos.exception.ErroAoAcessarRepositorioException;
 import br.com.catalogo.produtos.exception.NenhumProdutoInformadoException;
 import br.com.catalogo.produtos.exception.PrecoMenorIgualAZeroException;

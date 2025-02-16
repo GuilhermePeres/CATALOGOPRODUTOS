@@ -1,8 +1,9 @@
 package br.com.catalogo.produtos.usecase;
 
-import br.com.catalogo.produtos.controller.json.ProdutoJson;
+import br.com.catalogo.produtos.controller.api.json.ProdutoJson;
 import br.com.catalogo.produtos.domain.ItemPedidoReserva;
 import br.com.catalogo.produtos.domain.ProdutoBatch;
+import br.com.catalogo.produtos.gateway.PedidoGateway;
 import br.com.catalogo.produtos.gateway.ProdutoGateway;
 import br.com.catalogo.produtos.gateway.api.json.EstoqueRespostaJson;
 import br.com.catalogo.produtos.gateway.api.json.RegistrarRespostaJson;
@@ -17,13 +18,15 @@ import java.util.List;
 public class ProdutoUseCase {
 
     private final ProdutoGateway produtoGateway;
+    private final PedidoGateway pedidoGateway;
 
     private final List<RuleBase> rules;
 
     @Autowired
-    public ProdutoUseCase(ProdutoGateway produtoGateway, List<RuleBase> rules) {
+    public ProdutoUseCase(ProdutoGateway produtoGateway, PedidoGateway pedidoGateway, List<RuleBase> rules) {
         this.produtoGateway = produtoGateway;
         this.rules = rules;
+        this.pedidoGateway = pedidoGateway;
     }
 
     public RegistrarRespostaJson registrarProdutosEmLote(List<ProdutoBatch> produtoList){
@@ -32,8 +35,10 @@ public class ProdutoUseCase {
         return produtoGateway.registrarProdutosEmLote(produtoList);
     }
 
-    public EstoqueRespostaJson atualizarProdutosPorPedido(Long idPedido, List<ItemPedidoReserva> itens){
-        return produtoGateway.atualizarProdutosPorPedido(idPedido, itens);
+    public void atualizarProdutosPorPedido(Long idPedido, List<ItemPedidoReserva> itens){
+        EstoqueRespostaJson estoqueRespostaJson = produtoGateway.atualizarProdutosPorPedido(idPedido, itens);
+
+        pedidoGateway.enviarRespostaEstoque(estoqueRespostaJson);
     }
 
     public List<ProdutoJson> consultarProdutos() {

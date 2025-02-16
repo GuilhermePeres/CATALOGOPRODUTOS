@@ -1,4 +1,4 @@
-package br.com.catalogo.produtos.controller.json;
+package br.com.catalogo.produtos.controller.api.json;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

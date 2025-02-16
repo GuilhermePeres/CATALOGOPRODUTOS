@@ -1,6 +1,6 @@
 package br.com.catalogo.produtos.gateway;
 
-import br.com.catalogo.produtos.controller.json.ProdutoJson;
+import br.com.catalogo.produtos.controller.api.json.ProdutoJson;
 import br.com.catalogo.produtos.domain.ItemPedidoReserva;
 import br.com.catalogo.produtos.domain.ProdutoBatch;
 import br.com.catalogo.produtos.gateway.api.json.EstoqueRespostaJson;

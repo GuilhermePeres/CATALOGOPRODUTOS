@@ -1,6 +1,6 @@
 package br.com.catalogo.produtos.config;
 
-import br.com.catalogo.produtos.controller.json.ProdutoJson;
+import br.com.catalogo.produtos.controller.api.json.ProdutoJson;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 
