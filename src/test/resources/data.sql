@@ -1,19 +1,19 @@
 INSERT INTO produtos
     (ID, NOME, DESCRICAO, PRECO, QUANTIDADE_EM_ESTOQUE)
 VALUES
-    ((ABS(CAST(random() * 9223372036854775807 AS BIGINT))),
+    (1,
      'Discipulado Começa com Contemplação',
      'Livro de Samuel Whitefield. O que você está contemplando? Seja lá o que for, você será transformado à imagem disso...',
      59.97,
      10
     ),
-    ((ABS(CAST(random() * 9223372036854775807 AS BIGINT))),
+    (2,
      'Coração Selvagem',
      'Livro de John Eldredge. Descobrindo o segredo da alma de um homem. Qual é a vida que você deseja viver...',
      38.17,
      10
     ),
-    ((ABS(CAST(random() * 9223372036854775807 AS BIGINT))),
+    (3,
      'Temperamentos Transformados',
      'Livro de Tim LaHaye. É difícil mudar seu temperamento, não é? Como seria bom se você pudesse ser calmo como os...',
      64.90,
