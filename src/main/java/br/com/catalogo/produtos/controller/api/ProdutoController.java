@@ -10,6 +10,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,39 +39,36 @@ public class ProdutoController {
     public RegistrarRespostaJson registrarProdutosEmLote(@RequestParam("file") MultipartFile file) throws IOException,
             JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
 
-        File tempDir = Files.createTempDirectory("produtos-temp").toFile();
-        File fileToImport;
+        String resourcesPath = ResourceUtils.getFile("classpath:").getAbsolutePath();
 
-        try {
-            fileToImport = new File(tempDir, Objects.requireNonNull(file.getOriginalFilename()));
+        File fileToImport = new File(resourcesPath, Objects.requireNonNull(file.getOriginalFilename()));
 
-        }catch (Exception e){
-            throw new NenhumProdutoInformadoException();
-        }
+        try{
+            file.transferTo(fileToImport);
 
-        file.transferTo(fileToImport);
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addString("filePath", fileToImport.getAbsolutePath())
+                    .addLong("timestamp",System.currentTimeMillis())
+                    .toJobParameters();
 
-        JobParameters jobParameters = new JobParametersBuilder()
-                .addString("filePath", fileToImport.getAbsolutePath())
-                .toJobParameters();
+            JobExecution jobExecution = jobLauncher.run(processarProdutos, jobParameters);
 
-        JobExecution jobExecution = jobLauncher.run(processarProdutos, jobParameters);
+            List<?> listProdutos = (List<?>) jobExecution.getExecutionContext().get("produtos");
 
-        List<?> listProdutos = (List<?>) jobExecution.getExecutionContext().get("produtos");
+            if (listProdutos != null && !listProdutos.isEmpty() && listProdutos.getFirst() instanceof ProdutoBatch) {
+                List<ProdutoBatch> produtos = new ArrayList<>();
 
-        cleanUp(fileToImport);
+                for (Object produto : listProdutos) {
+                    produtos.add((ProdutoBatch) produto);
+                }
 
-        if (listProdutos != null && !listProdutos.isEmpty() && listProdutos.getFirst() instanceof ProdutoBatch) {
-            List<ProdutoBatch> produtos = new ArrayList<>();
-
-            for (Object produto : listProdutos) {
-                produtos.add((ProdutoBatch) produto);
+                return produtoUseCase.registrarProdutosEmLote(produtos);
             }
 
-            return produtoUseCase.registrarProdutosEmLote(produtos);
+            throw new NenhumProdutoInformadoException();
+        }finally {
+            cleanUp(fileToImport);
         }
-
-        throw new NenhumProdutoInformadoException();
     }
 
     private void cleanUp(File fileToImport) throws IOException {

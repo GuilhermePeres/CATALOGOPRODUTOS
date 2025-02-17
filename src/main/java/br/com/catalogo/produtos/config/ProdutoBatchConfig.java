@@ -3,16 +3,13 @@ package br.com.catalogo.produtos.config;
 import br.com.catalogo.produtos.domain.ProdutoBatch;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -24,7 +21,7 @@ public class ProdutoBatchConfig {
     @Bean
     public Job processarProdutos(JobRepository jobRepository, Step step, ProdutoJobCompletionListener listener) {
         return new JobBuilder("processarProdutos", jobRepository)
-                .incrementer(new RunIdIncrementer())
+                .incrementer(new MillisecondIncrementer())
                 .listener(listener)
                 .start(step)
                 .build();
@@ -42,14 +39,13 @@ public class ProdutoBatchConfig {
     }
 
     @Bean
-    @StepScope
-    public ItemReader<ProdutoBatch> itemReader(@Value("#{jobParameters['filePath']}") String filePath) {
+    public ItemReader<ProdutoBatch> itemReader() {
         BeanWrapperFieldSetMapper<ProdutoBatch> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
         fieldSetMapper.setTargetType(ProdutoBatch.class);
 
         return new FlatFileItemReaderBuilder<ProdutoBatch>()
                 .name("produtoItemReader")
-                .resource(new ClassPathResource(filePath))
+                .resource(new ClassPathResource("produtos.csv"))
                 .delimited().delimiter(",")
                 .names("nome", "descricao", "preco", "quantidadeEmEstoque")
                 .fieldSetMapper(fieldSetMapper)
