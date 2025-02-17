@@ -1,7 +1,7 @@
 package br.com.catalogo.produtos.usecase.rule;
 
 import br.com.catalogo.produtos.domain.ProdutoBatch;
-import br.com.catalogo.produtos.exception.QuantidadeMenorOuIgualAZeroException;
+import br.com.catalogo.produtos.exception.QuantidadeMenorQueZeroException;
 import br.com.catalogo.produtos.usecase.rule.dto.InputDto;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ public class QuantidadeMenorOuIgualAZeroRule implements RuleBase{
         ProdutoBatch novoProduto = inputDto.novoProduto();
 
         if(novoProduto.quantidadeEmEstoqueMenorQueZero()){
-            throw new QuantidadeMenorOuIgualAZeroException();
+            throw new QuantidadeMenorQueZeroException();
         }
     }
 }

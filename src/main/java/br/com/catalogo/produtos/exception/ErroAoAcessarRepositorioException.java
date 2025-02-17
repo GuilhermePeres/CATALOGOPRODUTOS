@@ -15,4 +15,7 @@ public class ErroAoAcessarRepositorioException extends RuntimeException{
     public String getCode(){
         return CODE;
     }
+
+    @Override
+    public String getMessage() { return MESSAGE; }
 }

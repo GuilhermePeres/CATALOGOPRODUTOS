@@ -3,9 +3,9 @@ package br.com.catalogo.produtos.exception;
 import lombok.Getter;
 
 @Getter
-public class PrecoMenorIgualAZeroException extends RuntimeException{
-    private static final String CODE = "produtos.precoMenorIgualAZero";
-    private static final String MESSAGE = "Preço está menor ou igual a zero.";
+public class QuantidadeMenorQueZeroException extends RuntimeException{
+    private static final String CODE = "produtos.quantidadeMenorQueZero";
+    private static final String MESSAGE = "Quantidade em estoque está menor que zero.";
     private static final Integer HTTPSTATUS = 422;
 
     public int getHttpStatus() {

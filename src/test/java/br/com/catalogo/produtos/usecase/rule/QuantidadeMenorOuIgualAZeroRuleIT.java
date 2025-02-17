@@ -1,7 +1,7 @@
 package br.com.catalogo.produtos.usecase.rule;
 
 import br.com.catalogo.produtos.domain.ProdutoBatch;
-import br.com.catalogo.produtos.exception.QuantidadeMenorOuIgualAZeroException;
+import br.com.catalogo.produtos.exception.QuantidadeMenorQueZeroException;
 import br.com.catalogo.produtos.usecase.rule.dto.InputDto;
 import br.com.catalogo.produtos.utils.ProdutoHelper;
 import org.junit.jupiter.api.Test;
@@ -43,6 +43,6 @@ class QuantidadeMenorOuIgualAZeroRuleIT {
 
         //Act
         assertThatThrownBy(() -> quantidadeMenorOuIgualAZeroRule.validate(inputDto))
-                .isInstanceOf(QuantidadeMenorOuIgualAZeroException.class);
+                .isInstanceOf(QuantidadeMenorQueZeroException.class);
     }
 }
