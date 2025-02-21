@@ -4,8 +4,19 @@ import br.com.catalogo.produtos.controller.api.json.ProdutoJson;
 import br.com.catalogo.produtos.domain.ItemPedidoReserva;
 import br.com.catalogo.produtos.domain.ProdutoBatch;
 import br.com.catalogo.produtos.gateway.database.jpa.entity.ProdutoEntity;
+import lombok.val;
+import org.springframework.web.multipart.MultipartFile;
+import sun.nio.cs.ISO_8859_1;
+import sun.nio.cs.US_ASCII;
+import sun.nio.cs.UTF_8;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 
@@ -77,5 +88,16 @@ public class ProdutoHelper {
                         BigDecimal.valueOf(49.46),
                         20)
         );
+    }
+
+    public static String gerarArquivoCsv(List<ProdutoBatch> produtos){
+        return produtos.getFirst().getNome() + ","
+                + produtos.getFirst().getDescricao() + ","
+                + produtos.getFirst().getPreco() + ","
+                + produtos.getFirst().getQuantidadeEmEstoque() + "\n"
+                + produtos.get(1).getNome() + ","
+                + produtos.get(1).getDescricao() + ","
+                + produtos.get(1).getPreco() + ","
+                + produtos.get(1).getQuantidadeEmEstoque();
     }
 }
